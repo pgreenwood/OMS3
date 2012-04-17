@@ -1,0 +1,18 @@
+- support for @Initialize and @Cleaup, @NoExec (For component).
+- meta data info class.
+- Nested compounds with cross boundary refereces. ???? (maybe not)
+- more Test cases
+- cyclic barrier instead of countdownlatch
+...
+
+Client->WS: Model Request
+note right of WS: Select instance or start one
+WS-->CC: Start  Instance
+CC-->CN:Select EMI and start
+CC-->CB:Cloud Node Provisioning
+CC-->WS:Create Cloud Instance
+WS-->UDDI:Register Model service
+WS-->CN:Invoke OMS 3 Model run
+CN-->CB:Audit Trace 
+CN-->WS:Result
+WS-->Client: Model Result or reference

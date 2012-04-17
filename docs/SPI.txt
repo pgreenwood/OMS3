@@ -1,0 +1,29 @@
+ 
+
+!!!The OMS Service Provider Interface for Data conversion and transformation
+
+!!What is an SPI
+
+!!Conversion SPI
+
+!!Example
+
+As a simple example, two components would like to share geospatial data. The semantic type of the data to be exchanged is identical, it is a geographical point with an x and a y coordinate. However the data type that is not compatible, the Java type system would not allow a simple assignment of values.
+
+Component Treader reads in an external dataset and provides a point as a well known text string (WKT). The second component GeomCalc reads a 
+ The types are different and incompatibme, so no type 
+
+{{
+class Treader {
+
+  @Out public String wkt_point;
+
+}
+}}
+
+
+class GeomCalc
+
+  @In public String 
+
+}

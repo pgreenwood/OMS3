@@ -1,0 +1,51 @@
+
+There are some documentation issues/thoughts/strategies.
+
+
+Requirements
+--------------
+- derive documentation from components/models/simulations
+- generate formal (component structure & meta data) and
+  informal (scientific background) documentation.
+- multiple language docs
+- open document format supported by many and open tools
+- multiple documentation output formats (e.g. doc,pdf,html,rtf,smgl)
+- create publishable/printable docs.
+- creating documentation must be an easy process for the user with respect
+- documentation must be structured, supports graphics and equations.
+
+
+Solution
+---------
+- Use Java principles (Locale) of localization as much as possible
+- Documentation Format: docbook5 format
+- The documentation generator
+
+
+Formatchain
+------------
+ - source -> docbook5 -> html/pdf/doc
+
+
+Toolchain
+------------
+  oms3 -> xxe -> fo
+  oms3 -> fo
+
+
+
+i18n Examples
+---------------
+
+In Description field (component & field)
+  @Description("Plant growth component")                    // no localization
+
+  @Description("Plant growth component (en)," +
+               "Pflanzenwachtumskomponente (de)")
+
+
+ Informal documentation reference:
+  @Documentation("src/PG.xml")
+  @Documentation("http://abc.com/file.xml")
+  @Documentation("file://abc.com/file.xml")
+  @Documentation("http://abc.com/file.xml")

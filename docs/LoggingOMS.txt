@@ -1,0 +1,70 @@
+
+Logging/Exception Handling
+==========================
+
+- stdout/stderr is respected now.
+- Errors messages are always shown as:
+     >>>> Error: XXXXX
+  
+- Full stack traces are *only* shown if LogLevel != OFF
+- Logging goes always to stderr (default java consolehandler)
+- Log entries are one line, not two;
+  e.g.   
+     ...      
+     04/22 14:12:54 CONFIG  TL component Comp_6f25f321_bfbe_46cf_8fa9_82adb0ffc364@4402a6ff
+     04/22 14:12:54 INFO    Init ...
+     ...
+
+- If there are compilation errors for the simulation file, and groovy throws a compilation
+  exception, it is now shown as :
+     >>>> Error: test.sim [line:22 column:23]  unexpected token: )
+
+
+
+Log levels and what happens:
+
+- OFF
+   No stack trace, except it comes from a model component
+   Error messages are 'one-liner' on stderr (OMS system exceptions)
+
+  e.g.
+        >>>> Error: Failed setting 'flow_param' type double <- For input string: "abc"
+
+
+- SEVERE - servere messages that will lead later to an exception, non-recoverable problems
+      - a paramter cannot be put into a model (conversion failed)
+ 
+- WARNING - potential problems for the model
+      - missing parameter from input
+
+- INFO - progress information 
+      - execution phases of the simulation.
+
+- CONFIG - model/sim configuration information
+   - constructing a simulation and model, 
+   - connecting components, 
+   - getting data into the model
+   - CLASSPATH setting
+   - reading environment variables
+
+- FINE - the finer rest
+   - The generated TL component 
+
+- FINER/FINEST ( not used )
+   
+
+
+System properties in OMS3
+--------
+                                   CLI      default    
+oms.version                RO
+oms.prj                    RO        x         ""
+oms.home                   RO        x         user.home/.oms/oms.version
+
+oms.check.circular        RO         x         false
+oms.check.param           RO         x         false
+
+
+
+
+

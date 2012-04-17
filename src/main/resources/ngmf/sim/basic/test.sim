@@ -1,0 +1,13 @@
+sim(name:"Tests") {
+    resource "$oms_prj/bin/"
+
+    model {
+        components  {
+            entity   'ngmf.sim.basic.Mainentry'  
+        }
+
+        parameter {
+            'entity.param'  100.1         // object.parameter -> value
+        }
+    }
+}

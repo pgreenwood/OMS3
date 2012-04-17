@@ -1,0 +1,67 @@
+/*
+ * $Id$"
+ *
+ * This file is part of the USDA-ARS AgES model component collection.
+ * It is derived from JAMS/J2K/J2KSN, FSU Jena, Germany.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ *
+ */
+tests(name:"Tests") {
+
+    resource "$oms_prj/bin/"
+    model (classname:"ngmf.sim.test.Mainentry")
+
+    test(name:"basic", 
+         data:['p1', 'p2', 'p3',
+                 1,    2,    3, 
+                 5,    6,    7,
+              ],
+          pre:{ 
+             println "pre ${it.p1} , ${it.p2}, ${it.p3}"
+          },
+          post:{
+             println "post ${it.p1} , ${it.p2}, ${it.p3}"
+          }
+    )
+
+    test(count: 10, timeout:200,
+          pre:{ 
+             Random r = new Random()
+             it.p1 = r.nextDouble()
+             it.p2 = 2.0
+             it.p3 = 3.0
+             println "pre ${it.p1} , ${it.p2}, ${it.p3}"
+          },
+
+          post:{
+//             assert it.est_coeff == 2.4
+//             assert it.estimate == 7.0
+          }
+    )
+
+    test(count: 10, ignore:"working on it", 
+          pre:{ 
+             it.p1 = 2.0
+             it.p2 = 2.0
+             it.p3 = 3.0
+          },
+
+          post:{
+             assert it.est_coeff == 2.4
+             assert it.estimate == 7.0
+          }
+    )
+}

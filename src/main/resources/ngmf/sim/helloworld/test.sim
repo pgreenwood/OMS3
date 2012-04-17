@@ -1,0 +1,11 @@
+sim {
+  resource "$oms_prj/bin/"
+  model {
+       parameter {
+             'c.message' "Hello World  ..."
+       }
+       components {
+           'c' 'ngmf.sim.helloworld.Component'
+       }
+    }
+}

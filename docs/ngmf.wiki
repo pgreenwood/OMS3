@@ -1,0 +1,563 @@
+!!!NGMF
+
+XML / annotations
+  tag > annotation
+  attribute > annotation field
+
+
+@Range(min=10, max=20)
+<xmlns:temp="http://oms/tmp">
+<xmlns:latitude="http://oms/tmp">
+
+<temp:Range min='10' max='20'/>
+<temp:Description> Temperature </temp:Description>
+
+
+Olaf David
+
+[{TableOfContents}]
+
+This document describes a core concept and a reference implementation of a 
+"Next Generation Modeling Framework" NGMF. This is a working title! The result of
+this research will be merged into the next generation of the Object Modeling 
+System to provide a as the core runtime and execution environment. 
+
+__Keywords__ Modeling Framework, Non-invasive Framework, OMS, CCA, ESMF, OpenMI
+ 
+
+!!Motivation
+
+Using frameworks for the development of scientific environmental simulation models became 
+an important ???
+
+*  Model/Component developer burden, easy scalability, 
+
+
+!!Concepts
+
+# NGMF is __component-based__. We
+  aim for only minimal requirements to call a plain java object a NGMF component.
+  Existing legacy classes are allowed to keep their identity, which means that once a
+  component has been introduces into NGMF it is still usable outside of NGMF. 
+# NGMF is __non-invasive__. It minimizes the burden to a component/model developer 
+  to get code into the framework by not imposing an API to a developer. There 
+  is almost no learning curve, existing Java code has not to be changed. There 
+  are no framework data types to learn and use, there are no communication 
+  patterns to comprehend to parallelize the model. All those features  resulted 
+  from experiences developing modeling frameworks in the past and looking at the 
+# NGMF is __multithreaded__. The default execution is multithreaded. Sequential 
+  execution is just a specific case of multithreaded execution where the 
+  dataflow requires the sequential execution of components. If data flow 
+  allows it, components are being executed in parallel. No explicit thread 
+  coding is needed to make this happen.
+# NGMF is __dataflow driven__. 
+
+
+!!Components
+The concept of a component refers 
+
+What is expected from a component modeling framework.
+
+* Component coupling
+* Component execution
+* Component unit testing
+
+All of those functions have to be as easy as possible for a model developer.
+
+
+A first component example
+{{{
+import ngmf.ann.*;
+
+@Description("Daylength computation.")                               (1)
+@Author(name="Joe Scientist")
+public class Daylen  {                                               (2)
+    
+    private static final int[] DAYS = {
+        15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349
+    };
+    
+    @In public java.util.Calendar currentTime;                       (3)
+    
+    @Role("Parameter")                                               (4)
+    @Range(min=-90, max=90)                                          (5)
+    @In public double latitude;              
+    
+    @Range(min=9, max=15)
+    @Out public double daylen;                                       (6)
+    
+    @Execute                                                         (7)
+    public void execute() {                                          (8)
+        int month  = currentTime.get(java.util.Calendar.MONTH);
+        
+        double dayl = DAYS[month] - 80.;
+        if (dayl < 0.0)
+            dayl = 285. + DAYS[month];
+        
+        double decr = 23.45 * Math.sin(dayl / 365. * 6.2832) * 0.017453;
+        double alat = latitude * 0.017453;
+        double csh = (-0.02908 - Math.sin(decr) * Math.sin(alat)) 
+                /(Math.cos(decr) * Math.cos(alat));
+        
+        daylen = 24.0 * (1.570796 - Math.atan(csh / 
+                  Math.sqrt(1. - csh * csh))) / Math.PI;
+    }
+}
+}}}
+
+Explanation:
+
+!!Component Metadata
+
+Annotations are being utilized to specify resources in a class that relate
+to its use as a component for NGMF. Such annotations might have different
+importance and relevance to different aspects of the use of the component within
+the framework. The same Annotations can also play different roles depending
+in the context use. 
+
+* __Documentation Annotations__ 
+  Those annotations are being used for documentations, presentation layers,
+  databases, and other content management system. This is required meta data
+  for component publication, but optional for execution.
+* __Execution Annotations__
+  Such meta data is essential information for component execution (in addition to 
+  the documentation purpose). Theu describe method invocation points and data flow  
+  between components. This is required meta data.
+* __Supporting Execution Annotations__
+  Such meta data supports the execution by providing additional information
+  about the kind of data flow, physical units, and range constraints that
+  might be used during execution. This is optional meta data.
+
+__Why Annotations?__
+Annotations are a Java feature since 1.5. They are an addon to the java language to
+allow for custom and domain specific markups of language elements. "They do
+not affect directely the class semantics, but they do affect the way 
+classes are treated by tools" (??). Annotations allow for the extension of
+the Java programs with meta information that can be picked up from sources,
+classes, or at runtime. They respect also scopes and and are supported by Java IDE's 
+with code completion and syntax higlighting.
+
+
+!! Meta data overview
+||
+
+
+!!Class level component metadata
+
+
+!!!{{Description}}
+The description annotations takes a String argument that provides component
+description information, such as a brief abstract about its purpose, scientific
+background, etc.
+
+{{{
+    @Description("Potential ET calculation using the Hamon equation)
+    public class HamonET {
+     ...
+    }
+}}}
+The {{@Documentation}} annotation is being used for automatic capturing the purpose of 
+a component for archiving, online presentation, database integration, and
+component selection during the process of model building. 
+
+!!!{{VersionInfo}}
+
+The {{VersionInfo}} annotation takes one string argument that represents the
+version of this component. A developer might use version control supported
+keyword substitution for this. The example below shows the use of the Subversion
+keyworks {{$Id}} to provide revision number, modification time, and committer
+name as version information.
+
+{{{
+    @VersionInfo("$Id:")
+    public class HamonET {
+     ...
+    }
+}}}
+
+!!!{{SourceInfo}}
+The {{SourceInfo}} annotation captures information about the source. This should 
+be some hint about aource availability, maybe the source location or some
+contact information. The example below shows the use of subversion's keyword 
+substitution for the head Url of a source file. This can also point to a
+specific tagged version with a repository. 
+
+{{{
+    @SourceInfo("$Id:")
+    public class HamonET {
+     ...
+    }
+}}}
+
+!!!{{Author}}
+The optional {{Author}} annotation provides information about the authorship of
+the component. The annotation fields {{name}}, {{org}}, and {{contact}} 
+will give more details. 
+
+__Author elements__
+* __name__ : the name of the author(s)
+* __org__ : organizational information
+* __contact__ : some contact information such as phone number or email adress.
+
+{{{
+    @Author(name="Joe Scientist", org="Research Org", contact="joe.scientist@research-org.edu")
+    public class HamonET {
+     ...
+    }
+}}}
+
+!!Field Component MetaData
+
+This section describes all meta data definitions valid on fields.
+
+!!!{{Description}}
+This annotation provides descriptive information about the field. A short 
+sentence is usually sufficient. The annotation is usually being used by 
+documentation tools, model builder tools, or repositories to supply
+meta data.
+
+{{{
+    ..
+    @Description("Potential Evapotranspiration.");
+    @Out public double potET;
+    ..
+}}}
+
+!!! {{In}}
+The {{In}} annotation on a field specifies it as input to the component. The 
+field has to be public as noted earlier. This that within the Execute
+method there is read access to the field.
+
+{{{
+    @In public double latitude;
+}}}
+
+!!! {{Out}}
+The {{Out}} annotation on a field specifies it as output of the component.
+The field has to be public and the Execute method will write to this. NGMF 
+used uses this field annotation to connect to another {{In}} field of
+another component.
+
+{{{
+    @Out public double daylen;
+}}}
+
+!!! {{Range}}
+The {{Range}} annotation is supporting meta data for an {{In}} or an {{Out}}
+field. If present it defines a min/max range in wich the value of the 
+field is valid. It is up to the execution runtime to handle the range information.
+Violating ranges might lead to execution abortion or just a warning message.
+Another use of the range information would be in component testing.
+
+{{{
+    @Range(min=-90, max=90)
+    @In public double latitude;
+}}}
+
+In the example above the latitude value can only be in the range of
+-90 to +90.
+
+!!! {{Role}}
+The {{Role}} annotation gives an {{In}} or {{Out}} tagged field a certain 
+meaning within the modeling domain. This allows someone who reads 
+the component source code or is using a builder tool that respect this
+annotation to present categorized views on field data. Such categories 
+might be "Parameter", "Variable", "Output", "Input", and others. 
+The {{Role}} annotation takes the category as a String parameter.
+categories can be freely defined.
+
+{{{
+    @Role("Parameter")
+    @Range(min=0, max=90)
+    @In public double latitude;
+}}}
+
+Now the {{latitide}} field is "tagged" as Parameter. 
+
+!!! {{Unit}}
+
+
+
+!!! {{Bound}}
+
+!!Method Annotations
+
+!!! {{Execute}}
+!!! {{Initialize}}
+!!! {{Finalize}}
+
+
+!!! Embedded Component Metadata
+
+{{{
+ import ngmf.ann.*;
+
+ public class Daylen {
+
+    static final int[] DAYS = {
+        15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349
+    };
+     
+    @Range(min=6, max=18)
+    @Out public double daylen;
+ 
+    @In public Calendar currentTime;
+ 
+    @Role(“Parameter”)    
+    @Range(min=-90, max=90)
+    @In public double latitude;
+ 
+    @Execute public void execute() {
+        int month  = currentTime.get(Calendar.MONTH);
+        double dayl = DAYS[month] - 80.;
+        if (dayl < 0.0)
+            dayl = 285. + DAYS[month];
+        
+        double decr = 23.45 * Math.sin(dayl/365.*6.2832)*0.017453;
+        double alat = latitude*0.017453;
+        double csh = (-0.02908 - Math.sin(decr) * Math.sin(alat))  
+                         /(Math.cos(decr) * Math.cos(alat));
+        daylen = 24.0 * (1.570796 - Math.atan(csh / 
+                         Math.sqrt(1. - csh * csh))) / Math.PI;
+    }
+ }
+}}}
+
+
+!! Attached Component MetaData
+
+The following Listing show a alternative implementation of the {{Daylen}} component. It was 
+split into two parts, (i) a pure computational component class {{Daylen.java}} and (ii) the component 
+metadata class {{ DaylenCompInfo.java }}. Only the latter one now has meta data dependencies 
+to NGMF.
+
+
+''DaylenCompInfo.java''
+{{{
+ 
+ import ngmf.ann.*;
+
+ public abstract class DaylenCompInfo {
+
+    @Out
+    @Range(min=6, max=18)
+    public double daylen;
+
+    @In 
+    public Calendar currentTime;
+
+    @In
+    @Role(“Parameter”)  
+    @Range(min=-90, max=90)
+    public double latitude;
+  
+    @Execute 
+    public abstract void execute();
+
+ }
+
+}}}
+
+As a rule, an attached component metadata class has the same name like the compoment but
+ends with {{CompInfo}}. This class has to be {{public}} __and__ {{abstract}}. It
+duplicates all the relevant fields and methods that should be annotated for NGMF.
+The methods should all be abstract. It is important to use the same spelling for fields
+and methods. 
+
+''Daylen.java''
+{{{
+
+ public class Daylen {
+
+    static final int[] DAYS = {
+        15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349
+    };
+
+    public double daylen;
+    public Calendar currentTime;
+    public double latitude;
+
+    public void execute() {
+        int month  = currentTime.get(Calendar.MONTH);
+        double dayl = DAYS[month] - 80.;
+        if (dayl < 0.0)
+            dayl = 285. + DAYS[month];
+        
+        double decr = 23.45 * Math.sin(dayl/365.*6.2832)*0.017453;
+        double alat = latitude*0.017453;
+        double csh = (-0.02908 - Math.sin(decr) * Math.sin(alat))  
+                         /(Math.cos(decr) * Math.cos(alat));
+        daylen = 24.0 * (1.570796 - Math.atan(csh / 
+                         Math.sqrt(1. - csh * csh))) / Math.PI;
+    }
+ }
+
+}}}
+
+There are pro and cons for using embedded and attached component metadata. External meta 
+data enables clean and neutral computational components parts with no framework 
+dependency. However, two separate files have to be managed and have to kept
+in sync while doing component development.
+
+!!Execution Interception and Listening
+
+!Unit Conversion
+
+!Excution Logging
+
+
+!!Integrations
+
+!Running the model as a Webservice (JAX)
+
+!Modeling Framework interoperability (OpenMI, OMS)
+
+!Cluster Execution (Terracotta)
+
+!Running the model in a Compute Cloud (EC2)
+
+!Component Testing (JUnit)
+
+
+!Accessing native code in Fortran/C (JNA)
+This sections demonstrates the integration and access of libraries
+written in languages other than Java into the system. In the scientific
+community common languages are C/C++/Fortran; Python is emerging. 
+The approach used here is using the JNA library (Java Native Interface). It does
+not belong to NGMF, however it offers an appealing simplicity and transparency 
+for its use in a framework.
+
+The Example below shows a Fortran implementation of {{HamonET}}. It is actually 
+using the Fortran 2003 {{BIND}} and {{VALUE}} keyword.
+
+{{{
+!     
+! File:   ftest.f90
+! Author: od
+!
+FUNCTION potET(daylen, temp, days) BIND(C, name='hamon')
+   REAL*8,VALUE :: daylen,temp
+   INTEGER*4,VALUE :: days
+   REAL*8 :: potET
+   REAL*8 :: Wt,D2
+   
+   Wt = 4.95 * exp(0.062 * temp) / 100.0
+   D2 = (daylen / 12.0) * (daylen / 12.0)
+   potET = 0.55 * days * D2 * Wt
+   print *, Wt
+   if (potET <= 0.0) then
+       potET = 0.0
+   endif
+   if (temp <= -1.0) then 
+       potET = 0.0
+   endif
+   potET = potET * 25.4
+END
+}}}
+
+A Java Component is still required. But it now more lightweight
+and proxies ot the Fortran function only. As defined by JNA
+the Java code binds directely to a Dynamic Linked Library (Dynamic Shared 
+Object) on any major OS with a simple Java interface. No JNI source generation
+or some othere source bridge building is required. You need to create 
+the DLL with your favorite IDE or just a makefile.
+
+{{{
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import ngmf.ann.Execute;
+import ngmf.ann.In;
+import ngmf.ann.Out;
+import java.util.Calendar;
+
+public class HamonET {
+    // the number of days per months
+    final static int[] DAYS = {
+        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+    };
+    
+    @In public double temp;
+    @In public double daylen;
+    @In public Calendar currentTime;
+    @Out public double potET;
+
+  // Interface binding 
+    interface ETLib extends Library {                                    (1)
+        double hamon(double daylen, double temp, int days);
+    }
+
+    // mapping the ETLib interface to "libF_ETLib.so" or "F_ETLib.dll"
+    ETLib etlib = (ETLib) Native.loadLibrary("F_ETLib", ETLib.class);    (2)
+
+    @Execute
+    public void executeNative() {
+        int month = currentTime.get(Calendar.MONTH);    
+        potET = etlib.hamon(daylen, temp, DAYS[month]);                  (3)
+    }
+}
+}}}
+
+* __(1)__: Definition of a Java interface that lists the 'hamon' function
+  with its Java signature. Needs to extends the JNA Library interface. In 
+  this example there is only one function to expose.
+
+* __(2)__: Binding of  "libF_ETLib.so" (UNIX) or "F_ETLib.dll" (WIN)
+  to the ETLib interface as an instance variable.
+
+* __(3)__: Calling the native {{hamon}} funtion with the native data types
+  of this component.
+ 
+
+The C version of the very same HamonET is shown below. Within the HamonET
+Java component, only the name of the Library needs to be changes, the
+binding interface and its use in Java will remain the same.
+
+{{{
+/* 
+ * File:   testc.c
+ */
+double hamon(double daylen, double temp, int days) {
+    double Wt = 4.95 * exp(0.062 * temp) / 100.;
+    double D2 = (daylen / 12.0) * (daylen / 12.0);
+    double potET = 0.55 * days * D2 * Wt;
+    if (potET <= 0.0) {
+        potET = 0.0;
+    }
+    if (temp <= -1.0) {
+        potET = 0.0;
+    }
+    potET *= 25.4;
+    return potET;
+}
+}}}
+
+For further details on how to manage Java and DLL/Shared Objects
+see this manual.
+
+
+
+!!Conclusions
+
+- No Overlapping feature set, NGMF is orthogonal to JNA, JUnit, ....
+- Java is an excellent language HUB
+
+
+
+!!Further Reading
+
+* Subversion
+* Annotations
+* Terracotta
+* JNA
+* OpenMI
+* Fortran 2003
+
+
+
+|| Annotation || Description || Argument Type || Example || Required 
+| ''Fields'' 
+| {{@In}}     | Tags \\ test | -              | {{@In public double \\temp}} | Y 
+| {{@Out}}    | Tags \\ test | -              | {{@In public double \\temp}} | Y
+
+| ''Methods'' 
+| ''Class'' 

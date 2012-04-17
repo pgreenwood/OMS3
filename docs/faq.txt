@@ -1,0 +1,24 @@
+
+!!! Frequently Asked Questions
+
+!What are Annotations?
+
+Annotations are a Java language feature 
+that allows adding of user defined meta data to
+language elements such as classes, fields, or 
+methods. Since they can be obtained using an API,
+they provide for OMS a powerful scheme of extending the
+language with modeling specific information.
+
+
+!Why is there no traditional for framwork - model interaction ?
+
+There are several ways to interact with the framework in OMS3.
+Core interactions such as execution control
+You use annotations for component development
+There is an API for creating higher level components,
+as well as support 
+
+!Why are the @In/Out fields public? Doesn't it violate some principles?
+
+Yes, usually fields are protected 

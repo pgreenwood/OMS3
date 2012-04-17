@@ -1,0 +1,210 @@
+
+
+
+OMS System properties:
+
+1) oms.version - the current OMS version : string               
+        e.g. "3.1"
+        
+2) oms.home  - The OMS home directory (Installation directory "oms-all.jar")
+    default: {user.home}/.oms/{oms.version}
+        e.g. "/home/od/.oms/3.1"
+        
+    (The     
+        
+3) oms.prj  - The current OMS project folder, containing all resources for 
+  the simulation.
+        e.g. "/omswork/erosion"
+        alternative oms3.work  (deprecated)
+
+As Java properties:
+
+        oms.version
+        oms.home
+        oms.prj
+        
+        System.getProperty("oms.home")
+        
+All Java properties are available from within the model and components.
+  
+Groovy simscript variables:
+        oms_version
+        oms_home
+        oms_prj
+
+ They can be used in the simulation file (.sim, .esp), mostly to reference 
+ resources such as input file, etc.
+
+ 
+
+Andrea discussion items from my point of view.
+
+- NAP - Native annotation processing in OMS3.1; FORTRAN components.
+  cpptasks (native compiler support for gcc/intel).
+
+- Integrated build support (pre-run, post-run, build); .oms/build.xml 
+  in projects.
+
+- Scala front end in addition to Groovy?
+
+- Conversion/Transformation SPI examples and directions.
+
+- OMS3 maven build system (current: ant/netbeans/eclipse)?
+
+- Visual stuff (model building/model structure exploration/ etc.). visual
+  vs scripting.
+
+- Compiler issue (tools.jar) discussion.
+
+
+Building OMS3 from source:
+
+Requirements:
+  java 1.6+
+  ant 1.8+
+  
+1. Check out all files from http://svn.javaforge.com/svn/oms/tags/<oms_version>
+    
+    e.g.
+    mkdir oms_build
+    cd oms_build
+    svn co http://svn.javaforge.com/svn/oms/tags/3.1
+    
+2. Build OMS files
+
+   cd ngmf.build/bin
+   ant
+
+   whis will create the files:   
+   oms-3.1-console.zip  oms-3.1-javadoc.zip  oms-3.1.zip
+
+   
+3. Run all tests   
+   ant test
+
+   
+   
+NAP in OMS3: Nutshell 
+
+Native annotation processing (NAP) is the method implemented in OMS3 to allow a
+streamlined integration of simulation code written in the C, C++ and FORTRAN 
+programming language. Thode language were and are being used within the 
+scientific community to develop environmental simulation models. LegaOperational 
+models for decision making  
+
+
+
+1 Compiler support gcc
+
+ Language features compatibility
+      F90 style declaration of parameter
+      ISO_C_BINDINGS
+      
+      
+2. Annotations to be used:
+    Execute/In/Out
+    
+3. Example    
+
+
+
+----------------------------------
+
+!!! OMS3 Training
+
+[{TableOfContents}]
+
+The following dates for training sessions are currently planned. All dates are
+tentative. We'll start with a first local training session, then invite a
+selected group of external model developer, and finally do the training
+Portland (NWCC).
+
+All training material (documents, source files, data, etc) will be stored at
+Javaforge.com.
+
+
+|1|ARS/NRCS/CSU Ft Collins Training| Aug 2
+|2|Collaborators training |Aug 16 or 23
+|3|NRCS Portland |Oct (TBD)
+
+
+The training is  
+
+                                                                                                    
+!!Preparation Steps
+Some training preparation should be done before hand.
+
+* Required reading 
+* Required software (IDE, Java, FTN, ant, ...)
+* Problem set recommendations on complexity, size, ...
+
+!!Day 1   (Component/Model development)
+
+__Morning__  
+* [Installation, Getting started|WIKIPAGE:114621]
+* Component Design
+* Annotations
+* Coding and Naming conventions, Best practices 
+
+__Afternoon__ 
+* Component Development Practice (java)
+* Components in FORTRAN / C
+* Unit testing
+
+!!Day 2 (Component integration)
+
+__Morning__
+* Compound components
+* Connectivity, Feedback, 
+* Model Design patterns
+* object field mapping
+
+__Afternoon__
+* feedback
+* Data conversions
+* packaging
+
+!!Day 3  (Simulation Setup)
+
+__Morning__
+* Projects / workspaces
+* Build system
+* Simulation setup
+* Files / CSV structure
+
+__Afternoon__
+* efficiencies, output strategies
+* output analysis, plots
+* Luca, FAST, DDS, GLUE
+
+
+!!Day4 (Participant choice)
+
+* Selected user problem sets
+* additional calibration and analysis methods
+* OMS3 integration
+* Command line interface, system API 
+* Interoperability with other systems (OpenMI,..)
+* Web service deployment
+* How to establish a OMS modeling community
+* Version Control and components
+* Auditing, Traceability
+* Documentation generation
+* Controlled vocab / Ontologies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

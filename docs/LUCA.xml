@@ -1,0 +1,1190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:m="http://www.w3.org/1998/Math/MathML"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <title></title>
+  </info>
+
+  <chapter>
+    <title></title>
+
+    <section>
+      <title>Luca Calibration (<code>luca</code>)</title>
+
+      <para>Luca (Let us calibrate) is a multiple-objective, stepwise,
+      automated procedure for model calibration. The calibration procedure
+      uses the Shuffled Complex Evolution global search algorithm to calibrate
+      any OMS3 model. Luca defines a OMS simulation type for building and
+      performing a procedure to calibrate parameters for a (hydrological)
+      model. It integrates the following components:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Multiple-objective, step-wise calibration</para>
+        </listitem>
+
+        <listitem>
+          <para>Shuffled Complex Evolution (SCE), a global-search parameter
+          optimization; and</para>
+        </listitem>
+
+        <listitem>
+          <para>OMS model interoperability.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para></para>
+
+      <section>
+        <title>Shuffled Complex Evolution (SCE)</title>
+
+        <para>The purpose of Shuffled Complex Evolution (SCE) is to calibrate
+        model parameters so that the model, which requires those parameters,
+        gives better results. SCE consists of the following steps:</para>
+
+        <orderedlist>
+          <listitem>
+            <para><emphasis role="bold">Generating points</emphasis>. The set
+            of parameters to be calibrated is considered as a point in N
+            dimension space where N is the number of parameters. SCE generates
+            many points, in which each parameter has a random value within its
+            lower and upper bound values.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">Assigning criterion values.</emphasis>
+            The model is run with every point (a set of parameters) generated
+            in SCE Step 1 as an input. An objective function that determines
+            how close the simulation results are to observed values is used to
+            calculate a criterion value for each point.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">Creating complexes.</emphasis> The
+            points are divided into smaller groups called complexes such that
+            points of good and bad criterion values are equally
+            distributed.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">Complex evolution. </emphasis>Each
+            complex is evolved in the following way: Several points are
+            selected from the complex to construct a sub-complex. In the
+            sub-complex, a new point is generated, and a point that has a bad
+            criterion value is replaced with this new point. This evolution
+            step is repeated several times with different random points in a
+            sub-complex.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">Combining complexes.</emphasis> All
+            points in the complexes are combined together to be one
+            group.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">SCE Steps (3) – (5) are called a
+            shuffling loop</emphasis>. It is repeated until the results of the
+            complex evolution meet one of the following end conditions:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>The number of model executions reaches the maximum
+                number of model execution</para>
+              </listitem>
+
+              <listitem>
+                <para>The percent change in the best criterion value of the
+                current shuffling loop and that of several shuffling loops
+                before is less than a specified percentage.</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
+
+        <para>The points converge into a very small region, which is less than
+        0.1% of the space within the lower and upper bounds of parameters. The
+        number of complexes used in SCE Step 3 decreases by 1 for every
+        shuffling loop. This decrease stops when the number of complexes
+        reaches the <emphasis role="bold">minimum number of complex
+        required</emphasis>. The output is the parameter file containing the
+        point (a parameter set) that has the best criterion value.</para>
+
+        <para><emphasis role="bold">Luca Rounds and Steps</emphasis></para>
+
+        <para><emphasis role="bold"></emphasis><figure>
+            <title>Rounds and Steps in Luca</title>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/Handbook/Slide22.PNG"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </figure></para>
+
+        <para><emphasis role="bold"></emphasis></para>
+
+        <para>In the multi-step calibration technique, a step and a round are
+        defined as follows:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>Steps</term>
+
+            <listitem>
+              <para>A step is associated with a parameter set, which contains
+              one or more parameter values and one or more objective
+              functions.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Rounds</term>
+
+            <listitem>
+              <para>A round consists of one or more steps.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        <para>[TBD]</para>
+
+        <para></para>
+
+        <para><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>step{}</secondary>
+          </indexterm><emphasis role="bold">Element luca{}</emphasis></para>
+
+        <para><variablelist>
+            <varlistentry>
+              <term>Name</term>
+
+              <listitem>
+                <para><code>luca</code> - defines a Luca calibration
+                simulation.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Properties</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="4">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Required</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>name</code></entry>
+
+                          <entry>the name of the simulation</entry>
+
+                          <entry>String</entry>
+
+                          <entry>y</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Sub elements</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="5">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Default</entry>
+
+                          <entry align="center">Occurrences</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>model{}</code></entry>
+
+                          <entry>the model to execute</entry>
+
+                          <entry></entry>
+
+                          <entry></entry>
+
+                          <entry>1</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>outputstrategy{}</code></entry>
+
+                          <entry>output management</entry>
+
+                          <entry></entry>
+
+                          <entry><code>StandardOutput</code></entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>resource</code></entry>
+
+                          <entry>simulation resource definition</entry>
+
+                          <entry>String</entry>
+
+                          <entry></entry>
+
+                          <entry>*</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>calibration_start</code></entry>
+
+                          <entry>start date of calibration</entry>
+
+                          <entry>ISO Date String</entry>
+
+                          <entry>-</entry>
+
+                          <entry>1</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag
+                          class="element">StartMonthOfYear</tag></entry>
+
+                          <entry>The first month of the 12-month year. Used to
+                          define the annual period for ObjFunc
+                          calculations.</entry>
+
+                          <entry>int : 1 (Jan) - 12 (Dec)</entry>
+
+                          <entry>1 (Jan)</entry>
+
+                          <entry>1</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>rounds</code></entry>
+
+                          <entry>number of rounds</entry>
+
+                          <entry>int</entry>
+
+                          <entry>1</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>step{}</code></entry>
+
+                          <entry>calibration step definition</entry>
+
+                          <entry></entry>
+
+                          <entry>-</entry>
+
+                          <entry>+</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag
+                          class="attribute">summary_file</tag></entry>
+
+                          <entry>Specifies the name of a summary file to
+                          create</entry>
+
+                          <entry>String</entry>
+
+                          <entry>no file generated
+                          n<superscript>1)</superscript></entry>
+
+                          <entry>1</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Notes</term>
+
+              <listitem>
+                <itemizedlist>
+                  <listitem>
+                    <para><superscript>1)</superscript>Summary File only
+                    generated if a name is specified. The file is created
+                    within the output directory for that run.</para>
+                  </listitem>
+                </itemizedlist>
+
+                <para></para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+
+        <para><emphasis role="bold"><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>step{}</secondary>
+          </indexterm>Element step{}</emphasis><variablelist>
+            <varlistentry>
+              <term>Name</term>
+
+              <listitem>
+                <para><code>step</code> - defines a single Luca calibration
+                step.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Properties</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="4">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Required</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>name</code></entry>
+
+                          <entry>the name of the step</entry>
+
+                          <entry>String</entry>
+
+                          <entry>n</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Sub elements</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="5">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Default</entry>
+
+                          <entry align="center">Occurrences</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>parameter</code></entry>
+
+                          <entry>parameter to calibrate</entry>
+
+                          <entry>-</entry>
+
+                          <entry>-</entry>
+
+                          <entry>+</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>objfunc</code></entry>
+
+                          <entry>objective function definition</entry>
+
+                          <entry>-</entry>
+
+                          <entry>-</entry>
+
+                          <entry>+</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>max_exec</code></entry>
+
+                          <entry>maximum # executions in one step</entry>
+
+                          <entry>int</entry>
+
+                          <entry>10000</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>init_complexes</code></entry>
+
+                          <entry>Initial number of complexes</entry>
+
+                          <entry>int</entry>
+
+                          <entry>2</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>points_per_complex</code></entry>
+
+                          <entry>Number of points in each complex</entry>
+
+                          <entry>int</entry>
+
+                          <entry>2*(# param values)+1</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>points_per_subcomplex</code></entry>
+
+                          <entry>Number of points in a sub-complex</entry>
+
+                          <entry>int</entry>
+
+                          <entry>(# param values) + 1</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>evolutions</code></entry>
+
+                          <entry>Number of evolution steps before
+                          shuffling</entry>
+
+                          <entry>int</entry>
+
+                          <entry>2*(# param values) + 1</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>min_complexes</code></entry>
+
+                          <entry>Minimum number of complexes required</entry>
+
+                          <entry>int</entry>
+
+                          <entry>1</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>shuffling_loops</code></entry>
+
+                          <entry>Shuffling loops in which the objective
+                          function value must change by given % before
+                          optimization is terminated</entry>
+
+                          <entry>int</entry>
+
+                          <entry>5</entry>
+
+                          <entry>?</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>of_percentage</code></entry>
+
+                          <entry>Percentage for the objective function value
+                          (Range: 0-1)</entry>
+
+                          <entry>double</entry>
+
+                          <entry>0.01</entry>
+
+                          <entry>?</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Notes</term>
+
+              <listitem>
+                <itemizedlist>
+                  <listitem>
+                    <para>If the name of the step is missing, it will be
+                    numbered instead.</para>
+                  </listitem>
+                </itemizedlist>
+
+                <para></para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+
+        <para></para>
+
+        <para><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>optimization{}</secondary>
+          </indexterm><emphasis role="bold">Element
+        objfunc{}</emphasis></para>
+
+        <para><variablelist>
+            <varlistentry>
+              <term>Name</term>
+
+              <listitem>
+                <para><code>objfunc</code> - defines an objective function
+                within a step.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Properties</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="4">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Required</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>method</code></entry>
+
+                          <entry>the objective function</entry>
+
+                          <entry><code>NS</code> | <code>RMSE</code> |
+                          <code>ABSDIF</code> | <code>LOGABSDIF</code> |
+                          <code>PMCC</code>
+                          <superscript>1)</superscript></entry>
+
+                          <entry>y</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>timestep</code></entry>
+
+                          <entry>the time step for simulated and observed
+                          values</entry>
+
+                          <entry><code><type>DAILY | MONTHLY_MEAN |
+                          MEAN_MONTHLY | ANNUAL_MEAN | PERIOD_MEDIAN |
+                          PERIOD_MIN | PERIOD_MAX |
+                          PERIOD_STDEV</type></code></entry>
+
+                          <entry>n (default: <code>DAILY</code>)</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>weight</code></entry>
+
+                          <entry>the objective function weight</entry>
+
+                          <entry>double (<code>0 - 1.0</code>)</entry>
+
+                          <entry>n <superscript>2)</superscript></entry>
+                        </row>
+
+                        <row>
+                          <entry><tag
+                          class="element">periodRange</tag></entry>
+
+                          <entry>Defines which months to include in
+                          analysis</entry>
+
+                          <entry>String ("m-n,p,...") where m,n,p are 1-12 for
+                          Jan-Dec</entry>
+
+                          <entry>n (default <tag
+                          class="attribute">"1-12"</tag>)</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag
+                          class="element">subdivide_value</tag></entry>
+
+                          <entry>If a subdivide file is specified, only
+                          include the dates matching this value in the
+                          subdivide file when computing the ObjFunc</entry>
+
+                          <entry><tag class="attribute">int</tag></entry>
+
+                          <entry>n (must be specified if a subdivide file is
+                          used.)</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag
+                          class="element">enableCache</tag></entry>
+
+                          <entry>Enables storing the OBS data in memory
+                          instead of rereading it from the file. This should
+                          make the optimization process run more quickly while
+                          not changing the results. Only enable where there
+                          are no size concerns about storing the obs data in
+                          memory throughout the run.</entry>
+
+                          <entry><tag class="attribute">boolean</tag></entry>
+
+                          <entry>n (default: <tag
+                          class="attribute">false</tag>).</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Sub elements</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="5">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Default</entry>
+
+                          <entry align="center">Occurrences</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>sim</code></entry>
+
+                          <entry>the simulated variable information</entry>
+
+                          <entry>sim{}</entry>
+
+                          <entry>-</entry>
+
+                          <entry>1</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag class="element">obs</tag></entry>
+
+                          <entry>the observed variable information</entry>
+
+                          <entry>obs{}</entry>
+
+                          <entry>-</entry>
+
+                          <entry>1</entry>
+                        </row>
+
+                        <row>
+                          <entry><tag class="element">subdivide</tag></entry>
+
+                          <entry>subdivide file containing information about
+                          which dates to use this objfunc for.</entry>
+
+                          <entry>subdivide{}</entry>
+
+                          <entry>do not use subdivide file</entry>
+
+                          <entry>1</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Notes</term>
+
+              <listitem>
+                <itemizedlist>
+                  <listitem>
+                    <para><itemizedlist>
+                        <listitem>
+                          <para><superscript>1)</superscript> If the method
+                          name is not one of the constants above, it is
+                          assumed to be the name of a user defined Java class
+                          that (i) implements the
+                          <code>oms3.ObjectiveFunction</code> interface, and
+                          (ii) is available on the <code>CLASSPATH</code>.
+                          This was a modeler can implement custom objective
+                          function(s) and use the in a simulation.</para>
+                        </listitem>
+
+                        <listitem>
+                          <para><superscript>2)</superscript> If the weight is
+                          not specified, all provided objective functions will
+                          be equally weighted. If specified, it has to be
+                          specified for <emphasis role="bold">all</emphasis>
+                          objective functions. The user has to ensure that the
+                          weights sum up to <code>1.0</code> for all objective
+                          functions.</para>
+                        </listitem>
+
+                        <listitem>
+                          <para>subdivide file has a date and a value for each
+                          day within the data range. If the value for a given
+                          date matches the subdivide_value of the objfunc,
+                          then that date's data is including in computing the
+                          objective function. If the value doesn't match, the
+                          data is ignored for that objfunc.</para>
+                        </listitem>
+
+                        <listitem>
+                          <para>Timesteps : defines how the data from the sim
+                          and obs files is used to compute the objective
+                          function. Data outside the periodRange is
+                          ignored.</para>
+
+                          <itemizedlist>
+                            <listitem>
+                              <para>Daily : use all of the mean daily
+                              values</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Monthly_Mean : use the monthly mean value for
+                              each month of each year</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Mean_Monthly : use the monthly mean value for
+                              each month across all years. E.g. All days in Jan
+                              across all years contribute to a mean value. All
+                              days in Feb contribute to a second value,
+                              etc.)</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Annual_Mean : use the mean of all data within
+                              each year. The annual period (i.e. year) starts in
+                              StartMonthOfYear</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Period_Median : use the median of all data
+                              within each year. The annual period (i.e. year)
+                              starts in StartMonthOfYear</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Period_Min : use the minimum of all data
+                              within each year. The annual period (i.e. year)
+                              starts in StartMonthOfYea</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Period_Max : use the maximum of all data
+                              within each year. The annual period (i.e. year)
+                              starts in StartMonthOfYea</para>
+                            </listitem>
+
+                            <listitem>
+                              <para>Period_Median : use the standard deviation of
+                              all data within each year. The annual period (i.e.
+                              year) starts in StartMonthOfYear</para>
+                            </listitem>
+                          </itemizedlist>
+                        </listitem>
+                      </itemizedlist>....</para>
+                  </listitem>
+                </itemizedlist>
+
+                <para></para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+
+        <para></para>
+
+        <para><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>sim{} , obs{}, and subdivide{}</secondary>
+          </indexterm><emphasis role="bold">Element sim{}, obs{}, and
+        subdivide{}</emphasis><variablelist>
+            <varlistentry>
+              <term>Name</term>
+
+              <listitem>
+                <para><code>sim</code> - defines simulated data to use.</para>
+
+                <para>obs - defines observed data to use</para>
+
+                <para>subdivide - defines subdivide data to use</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Properties</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="4">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Required</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>file</code></entry>
+
+                          <entry>The name of the data file</entry>
+
+                          <entry><tag class="attribute">String</tag></entry>
+
+                          <entry>y</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>table</code></entry>
+
+                          <entry>The name of the table within the file to
+                          use</entry>
+
+                          <entry><code><type>String</type></code></entry>
+
+                          <entry>y</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>column</code></entry>
+
+                          <entry>The name of the column within the table to
+                          use.</entry>
+
+                          <entry><tag class="attribute">String</tag></entry>
+
+                          <entry>y</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+
+                <para></para>
+
+                <para></para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+
+        <para><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>parameter{}</secondary>
+          </indexterm><emphasis role="bold">Element
+        parameter{}</emphasis></para>
+
+        <para><variablelist>
+            <varlistentry>
+              <term>Name</term>
+
+              <listitem>
+                <para><code>parameter</code> - defines model parameter to
+                calibrate</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Properties</term>
+
+              <listitem>
+                <para><informaltable>
+                    <tgroup cols="4">
+                      <thead>
+                        <row>
+                          <entry align="center"> Name</entry>
+
+                          <entry align="center"> Description</entry>
+
+                          <entry align="center">Type</entry>
+
+                          <entry align="center">Required</entry>
+                        </row>
+                      </thead>
+
+                      <tbody>
+                        <row>
+                          <entry><code>lower</code></entry>
+
+                          <entry>the lower boundary</entry>
+
+                          <entry>double</entry>
+
+                          <entry>y</entry>
+                        </row>
+
+                        <row>
+                          <entry><code>upper</code></entry>
+
+                          <entry>the upper boundary</entry>
+
+                          <entry>double</entry>
+
+                          <entry>y</entry>
+                        </row>
+                      </tbody>
+                    </tgroup>
+                  </informaltable></para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Sub Elements</term>
+
+              <listitem>
+                <informaltable>
+                  <tgroup cols="5">
+                    <thead>
+                      <row>
+                        <entry align="center"> Name</entry>
+
+                        <entry align="center"> Description</entry>
+
+                        <entry align="center">Type</entry>
+
+                        <entry align="center">Default</entry>
+
+                        <entry align="center">Occurrences</entry>
+                      </row>
+                    </thead>
+
+                    <tbody>
+                      <row>
+                        <entry><code>calibration</code></entry>
+
+                        <entry>calibration strategy definition</entry>
+
+                        <entry>calibration{}</entry>
+
+                        <entry>Mean. Range includes all parameter
+                        instances</entry>
+
+                        <entry>1</entry>
+                      </row>
+                    </tbody>
+                  </tgroup>
+                </informaltable>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Notes</term>
+
+              <listitem>
+                <para></para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+
+        <para></para>
+
+        <para><indexterm>
+            <primary>Simulation Element</primary>
+
+            <secondary>calibration{}</secondary>
+          </indexterm><emphasis role="bold">Element
+        calibration{}</emphasis></para>
+
+        <variablelist>
+          <varlistentry>
+            <term>Name</term>
+
+            <listitem>
+              <para>calibration- defines calibration strategy and
+              selection</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Properties</term>
+
+            <listitem>
+              <para><informaltable>
+                  <tgroup cols="4">
+                    <thead>
+                      <row>
+                        <entry align="center"> Name</entry>
+
+                        <entry align="center"> Description</entry>
+
+                        <entry align="center">Type</entry>
+
+                        <entry align="center">Required</entry>
+                      </row>
+                    </thead>
+
+                    <tbody>
+                      <row>
+                        <entry><code>strategy</code></entry>
+
+                        <entry>the calibration strategy</entry>
+
+                        <entry><code>MEAN</code> | <code>INDIVIDUAL</code>|
+                        <code>BINARY</code></entry>
+
+                        <entry>n (default:MEAN)</entry>
+                      </row>
+
+                      <row>
+                        <entry><code>range</code></entry>
+
+                        <entry>selects which parameters are included in
+                        calibration</entry>
+
+                        <entry>String ("m-n,p,..."), m,n,p are parameter
+                        indices</entry>
+
+                        <entry>n (default: "0-*" which means all
+                        included)</entry>
+                      </row>
+                    </tbody>
+                  </tgroup>
+                </informaltable></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Notes</term>
+
+            <listitem>
+              <para>Strategies</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>Mean : Optimize based on the mean value of the
+                  parameter instances. Regenerate the parameter instances
+                  values based on theoptimized value along with the initial
+                  variance of the parameter instance values.</para>
+                </listitem>
+
+                <listitem>
+                  <para>Individual : Optimize each parameter instance
+                  independently.</para>
+                </listitem>
+
+                <listitem>
+                  <para>Binary: Treat each individual parameter instance as a
+                  binary value. Optimize each individually.</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+
+      <section>
+        <title>References</title>
+
+        <para>SCE Related Papers</para>
+
+        <para>Duan, Q., Sorooshian, S. and Gupta, V.K., (1992). Effective and
+        efficient global optimization for conceptual rainfall-runoff models.
+        Water Resources Research 28 (4), 1015-1031.</para>
+
+        <para>Duan, Q., Sorooshian, S. and Gupta, V.K., (1993). A Shuffled
+        Complex Evolution approach for effective and efficient global
+        minimization. J. of Optimization Theory and its Applications, 76 (3),
+        501-521.</para>
+
+        <para>Duan, Q., Sorooshian, S. and Gupta, V.K., (1994). Optimal use of
+        the SCE-UA global optimization method for calibrating watershed
+        models. Journal of Hydrology, 158 265-284</para>
+
+        <para>Step-Wise, Multiple-Objectiveu Calibration Related Papers</para>
+
+        <para>Hay, L.E., Leavesley, G.H., Clark, M.P., Markstrom, S.L., Viger,
+        R.J., and Umemoto, M. (2006). Step-wise, multiple-objective
+        calibration of a hydrological model for a snowmelt-dominated basin.
+        Journal of the American Water Resources Association.</para>
+
+        <para>Hay, L.E., Leavesley, G.H., and Clark, M.P., (2006). Use of
+        Remotely-Sensed Snow Covered Area in Watershed Model Calibration for
+        the Sprague River, Oregon. Joint 8th Federal Interagency Sedimentation
+        Conference and 3rd Federal Interagency Hydrologic Modeling Conference,
+        Reno, Nevada, April, 2006.</para>
+
+        <para>Others</para>
+
+        <para>Leavesley, G.H. and L.G. Stannard, (1995). The
+        precipitation-runoff modeling system- PRMS. In: Computer Models of
+        Watershed Hydrology, Water Resources Publications, Highlands Ranch,
+        CO, edited by V.P Singh, Chapter 9, 281-310.</para>
+
+        <para>Leavesley, G.H., Restrepo, P.J., Markstrom, S.L., Dixon, M., and
+        Stannard, L.G., (1996). The modular modeling system - MMS: User's
+        manual: U.S. Geological Survey Open File Report 96-151, 200 p.</para>
+      </section>
+    </section>
+  </chapter>
+
+  <index></index>
+</book>
